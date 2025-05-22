@@ -1,45 +1,185 @@
 ﻿@model IEnumerable<ExamenAWS.Models.Comic>
+@{
+    var imagenUrl = configuration.GetValue<string>("AWS:BucketUrl");
+    ViewData["Title"] = "Colección de Cómics";
+}
 
-    @{
-	var imagenUrl = configuration.GetValue<string>("AWS:BucketUrl");
+<style>
+    .comics-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
     }
 
-@{
-    ViewData["Title"] = "Index";
-}
+    .header-section {
+        text-align: center;
+        margin-bottom: 3rem;
+        color: white;
+    }
 
-<h1>Index</h1>
+        .header-section h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.IdComic)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Nombre)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Imagen)
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdComic)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nombre)
-            </td>
-            <td>
-                <img src="@imagenUrl@item.Imagen" style="width:150px; height:100px" />
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+        .header-section p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+    .create-btn {
+        display: inline-block;
+        background: #ff6b6b;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        margin-top: 1rem;
+    }
+
+        .create-btn:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+    .comics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+        padding: 0 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .comic-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+        .comic-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+    .comic-image-container {
+        position: relative;
+        height: 250px;
+        overflow: hidden;
+    }
+
+    .comic-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .comic-card:hover .comic-image {
+        transform: scale(1.05);
+    }
+
+    .comic-id-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: bold;
+    }
+
+    .comic-content {
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .comic-title {
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: #333;
+        margin: 0;
+        line-height: 1.3;
+    }
+
+    .comic-subtitle {
+        color: #666;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+        opacity: 0.8;
+    }
+
+    .no-comics {
+        text-align: center;
+        color: white;
+        font-size: 1.5rem;
+        margin-top: 4rem;
+    }
+
+        .no-comics i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+        }
+
+</style>
+
+<div class="comics-container">
+    <div class="header-section">
+        <h1>📚 Colección de Cómics</h1>
+        <p>Descubre historias increíbles en nuestra biblioteca digital</p>
+        <a asp-action="Create" class="create-btn">
+            ➕ Agregar Nuevo Cómic
+        </a>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="comics-grid">
+            @foreach (var comic in Model)
+            {
+                <div class="comic-card">
+                    <div class="comic-image-container">
+                        @if(@comic.Imagen != null)
+                        {
+                            <img src="@imagenUrl@comic.Imagen"
+                                 alt="@comic.Nombre"
+                                 class="comic-image"
+                                 />
+                        }
+                        else
+                        {
+                            <p>No hay img</p>
+                        }
+                        <div class="comic-id-badge">#@comic.IdComic</div>
+                    </div>
+                    <div class="comic-content">
+                        <h3 class="comic-title">@comic.Nombre</h3>
+                        <p class="comic-subtitle">Cómic Digital</p>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="no-comics">
+            <div>📖</div>
+            <p>No hay cómics disponibles aún</p>
+            <p style="font-size: 1rem; opacity: 0.8;">¡Agrega tu primer cómic para comenzar!</p>
+        </div>
+    }
+</div>

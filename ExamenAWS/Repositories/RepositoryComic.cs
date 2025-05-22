@@ -1,5 +1,6 @@
 ﻿using ExamenAWS.Data;
 using ExamenAWS.Models;
+using ExamenAWS.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace ExamenAWS.Repositories
@@ -7,9 +8,11 @@ namespace ExamenAWS.Repositories
     public class RepositoryComic
     {
         private ComicsContext context;
-        public RepositoryComic(ComicsContext context)
+        private ServiceStorageS3 service;
+        public RepositoryComic(ComicsContext context, ServiceStorageS3 service)
         {
             this.context = context;
+            this.service = service;
         }
         public async Task<List<Comic>> GetComics()
         {
@@ -26,14 +29,18 @@ namespace ExamenAWS.Repositories
             return maxId + 1;
         }
 
-        public async Task<Comic> AddComic(Comic comic)
+        public async Task<Comic> AddComic(Comic comic, IFormFile file)
         {
             Comic com = new Comic
             {
                 IdComic = await MaxIdAsync(),
                 Nombre = comic.Nombre,
-                Imagen = comic.Imagen
+                Imagen = file.FileName
             };
+            using (Stream stream = file.OpenReadStream())
+            {
+                await service.UploadFileAsync(file.FileName, stream);
+            }
             context.Comics.Add(com);
             await context.SaveChangesAsync();
             return comic;

@@ -24,9 +24,9 @@ namespace ExamenAWS.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Comic comic)
+        public async Task<IActionResult> Create(Comic comic, IFormFile file)
         {
-            await this.repo.AddComic(comic);
+            await this.repo.AddComic(comic, file);
             return RedirectToAction("Index");
         }
     }
