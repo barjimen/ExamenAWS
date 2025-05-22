@@ -1,5 +1,9 @@
 ﻿@model IEnumerable<ExamenAWS.Models.Comic>
 
+    @{
+	var imagenUrl = configuration.GetValue<string>("AWS:BucketUrl");
+    }
+
 @{
     ViewData["Title"] = "Index";
 }
@@ -33,7 +37,7 @@
                 @Html.DisplayFor(modelItem => item.Nombre)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Imagen)
+                <img src="@imagenUrl@item.Imagen" style="width:150px; height:100px" />
             </td>
         </tr>
 }
